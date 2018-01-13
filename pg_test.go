@@ -7,9 +7,8 @@ import (
 )
 
 func TestGoGuyPool(t *testing.T) {
-	pool := NewPool(100, 1*time.Second)
+	pool := NewPool(10, 1*time.Second)
 	var wg sync.WaitGroup
-	retryTimes := 0
 	for i := 0; i < 100; i++ {
 		wg.Add(1)
 		a := i
@@ -19,8 +18,6 @@ func TestGoGuyPool(t *testing.T) {
 		})
 
 		if err != nil {
-			retryTimes++
-			i--
 			t.Log(err)
 			wg.Done()
 		}
@@ -31,5 +28,4 @@ func TestGoGuyPool(t *testing.T) {
 	pool.Stop()
 	t.Logf("after stop local list size : %d\n", pool.CurrentLocalListSize())
 	t.Logf("after stop go count : %d\n", pool.CurrentGoCount())
-	t.Logf("retryTimes: %d", retryTimes)
 }

@@ -122,13 +122,14 @@ func (p *Pool) autoClean(cleanList *[]*goguy) {
 		}
 		p.localFreeList = localFreeList[:cidx]
 	}
-	p.Unlock()
-
 	tempList := *cleanList
 	for i, gg := range tempList {
 		gg.ch <- nil
 		tempList[i] = nil
+		p.currentCount--
+
 	}
+	p.Unlock()
 }
 
 var getPoolCap = func() int {
@@ -219,9 +220,7 @@ func (p *Pool) runGuy(gg *goguy) {
 			break
 		}
 	}
-	p.Lock()
-	p.currentCount--
-	p.Unlock()
+
 }
 
 //释放goroutine
@@ -239,9 +238,6 @@ func (p *Pool) markRunnable(gg *goguy) bool {
 }
 
 func (p *Pool) CurrentGoCount() int {
-	if p.currentCount < 0 {
-		p.currentCount = 0
-	}
 	return p.currentCount
 }
 
